@@ -6,9 +6,9 @@
 | | |
 |---|---|
 | **Target rule** | `Scheduled Task Creation Via Schtasks.EXE` (`92626ddd-662c-49e3-ac59-f6535f12d189`) |
-| **ATT&CK** | T1053.005 — Scheduled Task/Job: Scheduled Task |
+| **ATT&CK** | T1053.005 Scheduled Task/Job: Scheduled Task |
 | **Result** | Target rule does not fire for this technique. Two alternate telemetry layers capture it, but both require non-default configuration, and only one has an actively maintained Sigma rule. |
-| **Classification** | Candidate gap requiring further review — confirmed structurally, with a documented compensating control at a different telemetry layer |
+| **Classification** | Candidate gap requiring further review confirmed structurally, with a documented compensating control at a different telemetry layer |
 | **Environment** | corp.local lab, Windows 11 client (build 26100), Sysmon |
 
 ---
@@ -270,8 +270,8 @@ Audit policy and TaskScheduler-Operational log left enabled — useful for ongoi
 - [win_taskscheduler_rare_schtask_creation.yml (unsupported)](https://github.com/SigmaHQ/sigma/blob/master/unsupported/windows/win_taskscheduler_rare_schtask_creation.yml)
 - [Microsoft: Event 4698](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-4698)
 - [Microsoft: Event ID 106](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/cc774938(v=ws.10))
-- [Latrodectus COM bypass — guardsix](https://guardsix.com/blog/shenanigans-of-scheduled-tasks)
-- [DarkHotel COM detection — cyberandramen](https://cyberandramen.net/2022/03/30/detecting-com-object-tasks-by-darkhotel/)
+- [Latrodectus COM bypass guardsix](https://guardsix.com/blog/shenanigans-of-scheduled-tasks)
+- [DarkHotel COM detection cyberandramen](https://cyberandramen.net/2022/03/30/detecting-com-object-tasks-by-darkhotel/)
 - MITRE ATT&CK T1053.005
 
 ---
