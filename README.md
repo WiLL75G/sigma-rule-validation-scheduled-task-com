@@ -202,12 +202,12 @@ Verified against a direct clone of SigmaHQ/sigma master on 2026-08-22.
 
 | Rule | Log source | EID | Status | Fires for COM technique? |
 |---|---|---|---|---|
-| proc_creation_win_schtasks_creation.yml (92626ddd) | Sysmon EID 1 | 1 | active | No — structurally blind, Image never equals schtasks.exe |
+| proc_creation_win_schtasks_creation.yml (92626ddd) | Sysmon EID 1 | 1 | active | No structurally blind, Image never equals schtasks.exe |
 | win_taskscheduler_rare_schtask_creation.yml (b20f6158) | TaskScheduler-Operational | 106 | unsupported | Would match EID but not part of active ruleset |
-| win_taskscheduler_execution_from_susp_locations.yml | TaskScheduler-Operational | 129 | active | No — keys on task execution not creation |
-| win_taskscheduler_lolbin_execution_via_task_scheduler.yml | TaskScheduler-Operational | 129 | active | No — keys on task execution not creation |
-| win_taskscheduler_susp_schtasks_delete_or_disable.yml | Security | 4699/4701 | active | No — keys on task deletion and disable |
-| win_security_susp_scheduled_task_creation.yml (3a734d25) | Security | 4698 | active (test) | Partially — requires suspicious command AND suspicious path. Our harmless test payload matched the command clause but not the path clause. A realistic malicious payload referencing AppData or Temp would satisfy both. |
+| win_taskscheduler_execution_from_susp_locations.yml | TaskScheduler-Operational | 129 | active | No keys on task execution not creation |
+| win_taskscheduler_lolbin_execution_via_task_scheduler.yml | TaskScheduler-Operational | 129 | active | No keys on task execution not creation |
+| win_taskscheduler_susp_schtasks_delete_or_disable.yml | Security | 4699/4701 | active | No keys on task deletion and disable |
+| win_security_susp_scheduled_task_creation.yml (3a734d25) | Security | 4698 | active (test) | Partially requires suspicious command AND suspicious path. Our harmless test payload matched the command clause but not the path clause. A realistic malicious payload referencing AppData or Temp would satisfy both. |
 
 ---
 
