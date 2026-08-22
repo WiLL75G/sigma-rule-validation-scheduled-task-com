@@ -190,12 +190,12 @@ Verified against a direct clone of SigmaHQ/sigma master on 2026-08-22.
 
 | Rule | EID | Status | Fires? |
 |---|---|---|---|
-| proc_creation_win_schtasks_creation.yml | 1 | active | No — Image never equals schtasks.exe |
+| proc_creation_win_schtasks_creation.yml | 1 | active | No Image never equals schtasks.exe |
 | win_taskscheduler_rare_schtask_creation.yml | 106 | unsupported | Not in active ruleset |
-| win_taskscheduler_execution_from_susp_locations.yml | 129 | active | No — execution only |
-| win_taskscheduler_lolbin_execution_via_task_scheduler.yml | 129 | active | No — execution only |
-| win_taskscheduler_susp_schtasks_delete_or_disable.yml | 4699/4701 | active | No — deletion only |
-| win_security_susp_scheduled_task_creation.yml | 4698 | active (test) | Partially — payload dependent, non-default audit policy required |
+| win_taskscheduler_execution_from_susp_locations.yml | 129 | active | No execution only |
+| win_taskscheduler_lolbin_execution_via_task_scheduler.yml | 129 | active | No execution only |
+| win_taskscheduler_susp_schtasks_delete_or_disable.yml | 4699/4701 | active | No deletion only |
+| win_security_susp_scheduled_task_creation.yml | 4698 | active (test) | Partially payload dependent, non-default audit policy required |
 
 
 ## Finding
@@ -242,7 +242,7 @@ Scripts deleted: sigma-alt-schtasks-com.ps1, sigma-alt-schtasks-com2.ps1, sigma-
 
 ![10 cleanup verified](screenshots/10%20cleanup%20verified.png)
 
-Audit policy and TaskScheduler-Operational log left enabled — useful for ongoing lab visibility.
+Audit policy and TaskScheduler-Operational log left enabled useful for ongoing lab visibility.
 
 
 ## References
