@@ -1,23 +1,20 @@
-
-# Sigma Rule Validation: Scheduled Task Creation via COM Object
+# Sigma Rule Validation Scheduled Task Creation via COM Object
 
 ## At a Glance
 
 | | |
 |---|---|
-| **Target rule** | `Scheduled Task Creation Via Schtasks.EXE` (`92626ddd-662c-49e3-ac59-f6535f12d189`) |
+| **Target rule** | Scheduled Task Creation Via Schtasks.EXE (92626ddd-662c-49e3-ac59-f6535f12d189) |
 | **ATT&CK** | T1053.005 Scheduled Task/Job: Scheduled Task |
 | **Result** | Target rule does not fire for this technique. Two alternate telemetry layers capture it, but both require non-default configuration, and only one has an actively maintained Sigma rule. |
 | **Classification** | Candidate gap requiring further review confirmed structurally, with a documented compensating control at a different telemetry layer |
 | **Environment** | corp.local lab, Windows 11 client (build 26100), Sysmon |
 
----
 
 ## Objective
 
 Determine whether a scheduled task can be created using the `Schedule.Service` COM object without ever invoking `schtasks.exe`, and if so, characterize exactly what is and is not visible to the current SigmaHQ ruleset as a result.
 
----
 
 ## Existing Detection
 
@@ -29,19 +26,16 @@ Determine whether a scheduled task can be created using the `Schedule.Service` C
 
 This is a process creation rule. It can only ever see processes that get spawned. That is the structural constraint this project tests.
 
----
 
 ## Research Question
 
 Can a scheduled task be created using the `Schedule.Service` COM object via PowerShell such that no `schtasks.exe` process creation event is ever generated, while the task registers normally in Task Scheduler? And if so, is that activity visible anywhere else in the default SigmaHQ ruleset?
 
----
 
 ## Hypothesis
 
 The COM object exposes task registration as an in-process API call from the calling process (`powershell.exe`), not as a separate helper binary. A rule anchored solely on `schtasks.exe` in the `Image` field should therefore be structurally blind to this technique, regardless of payload content.
 
----
 
 ## Environment
 
@@ -50,7 +44,6 @@ The COM object exposes task registration as an in-process API call from the call
 - Splunk Universal Forwarder present as background process
 - Three telemetry sources checked: Sysmon EID 1, TaskScheduler-Operational EID 106, Security EID 4698
 
----
 
 ## Telemetry Requirements
 
@@ -60,13 +53,11 @@ The COM object exposes task registration as an in-process API call from the call
 | Microsoft-Windows-TaskScheduler/Operational EID 106 | Disabled by default | Confirmed via Get-WinEvent -ListLog before testing |
 | Security EID 4698 | Requires Advanced Audit Policy: Object Access > Other Object Access Events | Not enabled by default, confirmed via auditpol /get before testing |
 
----
 
 ## Methodology
 
 Standard control then alternative then telemetry layer then sibling rule sequence. Every claim is backed by a command run on the lab VM and its actual output. Nothing is inferred or assumed.
 
----
 
 ## Control Test
 
@@ -103,7 +94,6 @@ Manual field-by-field evaluation against rule `92626ddd`:
 
 Condition evaluates true. Control confirmed: rule fires as designed.
 
----
 
 ## Alternative Test
 
@@ -128,7 +118,6 @@ Task registered successfully: `State: 3 (Ready)`, `Enabled: True`, full XML defi
 
 ![06 alternative execution](screenshots/06%20alternative%20execution.png)
 
----
 
 ## Raw Telemetry Analysis
 
@@ -194,22 +183,20 @@ ClientProcessId: 13136
 
 This is the richest of the three layers, but also requires non-default configuration.
 
----
 
 ## Detection Logic Comparison
 
 Verified against a direct clone of SigmaHQ/sigma master on 2026-08-22.
 
-| Rule | Log source | EID | Status | Fires for COM technique? |
-|---|---|---|---|---|
-| proc_creation_win_schtasks_creation.yml (92626ddd) | Sysmon EID 1 | 1 | active | No structurally blind, Image never equals schtasks.exe |
-| win_taskscheduler_rare_schtask_creation.yml (b20f6158) | TaskScheduler-Operational | 106 | unsupported | Would match EID but not part of active ruleset |
-| win_taskscheduler_execution_from_susp_locations.yml | TaskScheduler-Operational | 129 | active | No keys on task execution not creation |
-| win_taskscheduler_lolbin_execution_via_task_scheduler.yml | TaskScheduler-Operational | 129 | active | No keys on task execution not creation |
-| win_taskscheduler_susp_schtasks_delete_or_disable.yml | Security | 4699/4701 | active | No keys on task deletion and disable |
-| win_security_susp_scheduled_task_creation.yml (3a734d25) | Security | 4698 | active (test) | Partially requires suspicious command AND suspicious path. Our harmless test payload matched the command clause but not the path clause. A realistic malicious payload referencing AppData or Temp would satisfy both. |
+| Rule | EID | Status | Fires? |
+|---|---|---|---|
+| proc_creation_win_schtasks_creation.yml | 1 | active | No — Image never equals schtasks.exe |
+| win_taskscheduler_rare_schtask_creation.yml | 106 | unsupported | Not in active ruleset |
+| win_taskscheduler_execution_from_susp_locations.yml | 129 | active | No — execution only |
+| win_taskscheduler_lolbin_execution_via_task_scheduler.yml | 129 | active | No — execution only |
+| win_taskscheduler_susp_schtasks_delete_or_disable.yml | 4699/4701 | active | No — deletion only |
+| win_security_susp_scheduled_task_creation.yml | 4698 | active (test) | Partially — payload dependent, non-default audit policy required |
 
----
 
 ## Finding
 
@@ -219,7 +206,6 @@ The technique does not evade detection entirely. It is visible via TaskScheduler
 
 The EID 106-based creation rule (`b20f6158`) that previously covered this layer has been moved to `status: unsupported` and is no longer part of the active ruleset.
 
----
 
 ## Sibling Rule Analysis
 
@@ -229,7 +215,6 @@ Three rules currently active under `rules/windows/builtin/taskscheduler/` cover 
 
 `win_security_susp_scheduled_task_creation.yml` (`3a734d25`, `status: test`) is the only active rule touching task creation events. Its own `definition` field already documents the audit policy prerequisite, so this is a known and not novel limitation from the rule author's side.
 
----
 
 ## Limitations
 
@@ -238,7 +223,6 @@ Three rules currently active under `rules/windows/builtin/taskscheduler/` cover 
 - The exact commit and rationale for `b20f6158` being moved to unsupported were not confirmed via git log, only via direct file presence in the repo. This would strengthen the writeup if verified before upstream submission.
 - All rule logic verification was manual field-by-field comparison. No SIEM query conversion was performed.
 
----
 
 ## Recommendation
 
@@ -247,7 +231,6 @@ Do not propose a replacement EID 106 rule without first understanding why `b20f6
 1. Add a `related:` reference in `proc_creation_win_schtasks_creation.yml` pointing to `win_security_susp_scheduled_task_creation.yml` as a documented compensating control, so operators know where to look.
 2. Evaluate whether the path clause in `win_security_susp_scheduled_task_creation.yml` is too strict for realistic adversary payloads that reference non-standard paths not currently in the list.
 
----
 
 ## Cleanup
 
@@ -261,7 +244,6 @@ Scripts deleted: sigma-alt-schtasks-com.ps1, sigma-alt-schtasks-com2.ps1, sigma-
 
 Audit policy and TaskScheduler-Operational log left enabled — useful for ongoing lab visibility.
 
----
 
 ## References
 
@@ -270,11 +252,10 @@ Audit policy and TaskScheduler-Operational log left enabled — useful for ongoi
 - [win_taskscheduler_rare_schtask_creation.yml (unsupported)](https://github.com/SigmaHQ/sigma/blob/master/unsupported/windows/win_taskscheduler_rare_schtask_creation.yml)
 - [Microsoft: Event 4698](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-4698)
 - [Microsoft: Event ID 106](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/cc774938(v=ws.10))
-- [Latrodectus COM bypass guardsix](https://guardsix.com/blog/shenanigans-of-scheduled-tasks)
-- [DarkHotel COM detection cyberandramen](https://cyberandramen.net/2022/03/30/detecting-com-object-tasks-by-darkhotel/)
+- [Latrodectus COM bypass — guardsix](https://guardsix.com/blog/shenanigans-of-scheduled-tasks)
+- [DarkHotel COM detection — cyberandramen](https://cyberandramen.net/2022/03/30/detecting-com-object-tasks-by-darkhotel/)
 - MITRE ATT&CK T1053.005
 
----
 
 ## Upstream Issue
 
