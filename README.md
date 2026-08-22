@@ -258,5 +258,4 @@ Audit policy and TaskScheduler-Operational log left enabled useful for ongoing l
 
 
 ## Upstream Issue
-
-[PLACEHOLDER — issue not yet submitted. Duplicate search performed prior to this project confirmed no existing SigmaHQ discussion of this specific technique.]
+Upstream issue submitted: https://github.com/SigmaHQ/sigma/issues/6249
